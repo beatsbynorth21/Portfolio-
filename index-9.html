@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NORTHHH — Developer & Beatmaker</title>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #0a0912;
+  --bg2: #100e1a;
+  --bg3: #171320;
+  --accent: #c97b86;
+  --accent2: #e8a5ad;
+  --cyan: #7fa8a3;
+  --text: #ece8e4;
+  --muted: #6f6a78;
+  --border: rgba(201,123,134,0.16);
+}
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Sora', sans-serif;
+  overflow-x: hidden;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.5;
+}
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: repeating-linear-gradient(0deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 3px);
+}
+.blink { animation: blink 1.1s steps(2, jump-none) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.3rem 4rem;
+  backdrop-filter: blur(20px);
+  background: rgba(10,9,18,0.82);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  font-family: 'Big Shoulders Display', sans-serif;
+  font-weight: 800;
+  font-size: 1.5rem;
+  letter-spacing: 0.1em;
+  color: var(--text);
+}
+.nav-logo span { color: var(--accent); }
+.nav-links { display: flex; gap: 2.4rem; list-style: none; align-items: center; }
+.nav-links a {
+  color: var(--muted);
+  text-decoration: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: color 0.3s;
+}
+.nav-links a:hover { color: var(--accent); }
+.nav-status {
+  display: flex; align-items: center; gap: 0.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem; color: var(--cyan); letter-spacing: 0.08em;
+}
+.nav-status .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); }
+.nav-right { display: flex; align-items: center; gap: 1.6rem; }
+.corner-clock {
+  position: fixed;
+  top: 5.5rem;
+  right: 1.5rem;
+  z-index: 90;
+  font-family: 'JetBrains Mono', monospace;
+  text-align: right;
+  line-height: 1.4;
+  background: rgba(10,9,18,0.6);
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--border);
+  pointer-events: none;
+}
+.corner-clock .clock-time { display: block; color: var(--accent2); font-size: 0.85rem; font-weight: 500; letter-spacing: 0.06em; }
+.corner-clock .clock-time .clock-dot {
+  display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+  background: #39ff6a; margin-right: 0.5rem; vertical-align: middle;
+  box-shadow: 0 0 6px #39ff6a, 0 0 12px rgba(57,255,106,0.5);
+  opacity: 1; transition: opacity 0.9s ease-in-out;
+}
+.corner-clock .clock-time .clock-dot.off { opacity: 0.12; }
+.corner-clock .clock-date { display: block; color: var(--muted); font-size: 0.58rem; letter-spacing: 0.12em; margin-top: 0.15rem; }
+@media (max-width: 640px) { .corner-clock { top: 4.6rem; right: 0.8rem; padding: 0.3rem 0.6rem; } .corner-clock .clock-time { font-size: 0.72rem; } }
+
+#hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 4rem;
+  position: relative;
+  overflow: hidden;
+}
+.hero-bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 55% 45% at 75% 40%, rgba(201,123,134,0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 45% 55% at 15% 85%, rgba(127,168,163,0.05) 0%, transparent 65%);
+}
+.hero-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--cyan);
+  letter-spacing: 0.15em;
+  margin-bottom: 1.6rem;
+  opacity: 0.9;
+  display: flex; align-items: center; gap: 0.6rem;
+}
+.hero-title-wrap { display: flex; align-items: flex-end; gap: 2.5rem; flex-wrap: wrap; }
+.hero-title {
+  font-family: 'Big Shoulders Display', sans-serif;
+  font-weight: 800;
+  font-size: clamp(4.5rem, 13vw, 11.5rem);
+  line-height: 0.85;
+  letter-spacing: 0.01em;
+  color: var(--text);
+}
+.hero-title span { color: var(--accent); display: block; font-weight: 700; font-size: 0.4em; letter-spacing: 0.06em; margin-top: 0.3em; }
+.wave { display: flex; align-items: flex-end; gap: 4px; height: 70px; margin-bottom: 1rem; }
+.wave i {
+  display: block; width: 4px; background: var(--accent);
+  animation: eq 1.2s ease-in-out infinite;
+  opacity: 0.85;
+}
+.wave i:nth-child(1){height:20%;animation-delay:-1.1s;}
+.wave i:nth-child(2){height:55%;animation-delay:-0.9s;}
+.wave i:nth-child(3){height:85%;animation-delay:-0.7s;}
+.wave i:nth-child(4){height:40%;animation-delay:-0.5s;background:var(--cyan);}
+.wave i:nth-child(5){height:100%;animation-delay:-0.3s;}
+.wave i:nth-child(6){height:65%;animation-delay:-0.6s;}
+.wave i:nth-child(7){height:30%;animation-delay:-0.2s;background:var(--cyan);}
+.wave i:nth-child(8){height:75%;animation-delay:-0.8s;}
+@keyframes eq { 0%,100% { transform: scaleY(0.4); } 50% { transform: scaleY(1); } }
+@media (prefers-reduced-motion: reduce) { .wave i, .blink { animation: none; } }
+
+.hero-sub {
+  margin-top: 2.2rem;
+  font-size: 1.02rem;
+  color: var(--muted);
+  font-weight: 300;
+  letter-spacing: 0.01em;
+  max-width: 440px;
+  line-height: 1.8;
+}
+.hero-cta { margin-top: 3rem; display: flex; gap: 1rem; flex-wrap: wrap; }
+.btn {
+  display: inline-block;
+  padding: 0.85rem 2rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  font-family: 'JetBrains Mono', monospace;
+  text-decoration: none;
+  transition: all 0.3s;
+  cursor: pointer;
+  border: none;
+}
+.btn-primary { background: var(--accent); color: #0a0912; font-weight: 700; }
+.btn-primary:hover { background: var(--accent2); transform: translateY(-2px); }
+.btn-outline { background: transparent; color: var(--cyan); border: 1px solid var(--cyan); }
+.btn-outline:hover { background: rgba(127,168,163,0.08); transform: translateY(-2px); }
+.hero-scroll {
+  position: absolute; bottom: 2.5rem; left: 4rem;
+  display: flex; align-items: center; gap: 0.8rem;
+  color: var(--muted); font-size: 0.65rem; letter-spacing: 0.18em;
+  text-transform: uppercase; font-family: 'JetBrains Mono', monospace;
+}
+.hero-scroll::before { content: ''; display: block; width: 40px; height: 1px; background: var(--muted); }
+
+section { padding: 7rem 4rem; position: relative; z-index: 2; }
+.section-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--cyan);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.section-label::after { content: ''; flex: 1; max-width: 60px; height: 1px; background: var(--cyan); opacity: 0.4; }
+.section-title {
+  font-family: 'Big Shoulders Display', sans-serif;
+  font-weight: 800;
+  font-size: clamp(2.6rem, 5.5vw, 4.8rem);
+  line-height: 1;
+  letter-spacing: 0.01em;
+  margin-bottom: 3rem;
+}
+
+/* ABOUT */
+#about { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; }
+.about-text p { color: var(--muted); line-height: 1.9; margin-bottom: 1.2rem; font-size: 0.96rem; font-weight: 300; }
+.about-text p strong { color: var(--text); font-weight: 500; }
+.about-skills { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 2rem; }
+.skill-tag {
+  padding: 0.4rem 1rem; border: 1px solid var(--border);
+  font-size: 0.7rem; letter-spacing: 0.08em;
+  font-family: 'JetBrains Mono', monospace; color: var(--muted);
+  transition: all 0.3s;
+}
+.skill-tag:hover { border-color: var(--accent); color: var(--accent); }
+.about-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+.stat-box { padding: 2rem; border: 1px solid var(--border); background: var(--bg3); position: relative; overflow: hidden; }
+.stat-box::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--accent); }
+.stat-num { font-family: 'Big Shoulders Display', sans-serif; font-weight: 800; font-size: 3.2rem; color: var(--accent); line-height: 1; }
+.stat-label { font-size: 0.7rem; color: var(--muted); letter-spacing: 0.08em; margin-top: 0.4rem; text-transform: uppercase; font-family: 'JetBrains Mono', monospace; }
+
+/* PROJECTS */
+#projects { background: var(--bg); }
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5px;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+.project-card { background: var(--bg); padding: 2.5rem; position: relative; overflow: hidden; transition: background 0.3s; }
+.project-card:hover { background: var(--bg3); }
+.project-card::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--accent), transparent);
+  transform: scaleX(0); transform-origin: left; transition: transform 0.4s;
+}
+.project-card:hover::after { transform: scaleX(1); }
+.project-card.featured { grid-column: 1 / -1; }
+@media (min-width: 900px) { .project-card.featured { padding: 3rem 3.5rem; } }
+.project-flag {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.62rem;
+  color: var(--bg); background: var(--accent); padding: 0.25rem 0.7rem;
+  letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 1.2rem;
+}
+.project-num { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--cyan); opacity: 0.75; margin-bottom: 1.4rem; letter-spacing: 0.14em; }
+.project-title { font-family: 'Big Shoulders Display', sans-serif; font-weight: 800; font-size: 1.7rem; letter-spacing: 0.02em; margin-bottom: 0.7rem; color: var(--text); }
+.project-card.featured .project-title { font-size: 2.4rem; }
+.project-desc { font-size: 0.86rem; color: var(--muted); line-height: 1.75; margin-bottom: 1.4rem; font-weight: 300; }
+.project-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 1.2rem; margin-bottom: 1.6rem; }
+.project-meta div { font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
+.project-meta strong { display: block; font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; color: var(--cyan); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.35rem; }
+.project-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.project-tag { font-size: 0.62rem; padding: 0.25rem 0.7rem; background: rgba(201,123,134,0.1); color: var(--accent); letter-spacing: 0.08em; font-family: 'JetBrains Mono', monospace; }
+.project-arrow { position: absolute; top: 2.5rem; right: 2.5rem; font-size: 1.2rem; color: var(--muted); transition: all 0.3s; text-decoration: none; }
+.project-card:hover .project-arrow { color: var(--accent); transform: translate(3px, -3px); }
+.project-links { display: flex; gap: 1.4rem; flex-wrap: wrap; }
+.project-link { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.7rem; font-family: 'JetBrains Mono', monospace; color: var(--accent); text-decoration: none; letter-spacing: 0.08em; opacity: 0.8; transition: opacity 0.3s; }
+.project-link:hover { opacity: 1; }
+.project-link.alt { color: var(--cyan); }
+
+/* BEATS */
+#beats { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.beats-intro { max-width: 600px; color: var(--muted); font-size: 0.96rem; line-height: 1.8; margin-bottom: 3rem; font-weight: 300; }
+.sc-embed-wrap { border: 1px solid var(--border); margin-bottom: 2.5rem; overflow: hidden; background: var(--bg3); }
+.sc-embed-wrap iframe { width: 100%; display: block; }
+.stream-platforms { margin-bottom: 2.5rem; }
+.stream-label { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: var(--muted); letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 1rem; }
+.platform-links { display: flex; gap: 1rem; flex-wrap: wrap; }
+.platform-btn {
+  display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.7rem 1.4rem;
+  border: 1px solid var(--border); background: var(--bg3); color: var(--text);
+  text-decoration: none; font-size: 0.75rem; font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.06em; transition: all 0.3s;
+}
+.platform-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(201,123,134,0.05); transform: translateY(-2px); }
+.beats-cta { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+.beats-note { font-size: 0.75rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+
+/* CONTACT / BOOKING */
+#contact { background: var(--bg); }
+.booking-status {
+  display: inline-flex; align-items: center; gap: 0.7rem;
+  border: 1px solid var(--border); background: var(--bg3);
+  padding: 0.7rem 1.2rem; margin-bottom: 2.5rem;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--cyan); letter-spacing: 0.05em;
+}
+.booking-status .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--cyan); animation: blink 1.4s infinite; }
+.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; }
+.contact-left p { color: var(--muted); font-size: 0.96rem; line-height: 1.8; margin-bottom: 1.8rem; font-weight: 300; }
+.booking-tags { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 2.2rem; }
+.booking-tag { font-size: 0.68rem; padding: 0.4rem 0.9rem; border: 1px solid var(--border); color: var(--muted); font-family: 'JetBrains Mono', monospace; letter-spacing: 0.06em; }
+.contact-links { display: flex; flex-direction: column; gap: 0.8rem; }
+.contact-link {
+  display: flex; align-items: center; gap: 1rem; color: var(--muted); text-decoration: none;
+  font-size: 0.78rem; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.05em;
+  padding: 0.9rem 1.2rem; border: 1px solid var(--border); transition: all 0.3s;
+}
+.contact-link:hover { border-color: rgba(201,123,134,0.4); color: var(--accent); background: rgba(201,123,134,0.04); }
+.contact-link.priority { border-color: rgba(201,123,134,0.3); color: var(--accent2); }
+.contact-link-icon { font-size: 1rem; width: 20px; text-align: center; }
+.contact-form { display: flex; flex-direction: column; gap: 1rem; }
+.form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+.form-label { font-size: 0.65rem; color: var(--cyan); letter-spacing: 0.18em; text-transform: uppercase; font-family: 'JetBrains Mono', monospace; }
+.form-input, .form-textarea {
+  background: var(--bg2); border: 1px solid var(--border); color: var(--text);
+  padding: 0.9rem 1.2rem; font-family: 'Sora', sans-serif; font-size: 0.9rem;
+  outline: none; transition: border-color 0.3s; resize: none;
+}
+.form-input:focus, .form-textarea:focus { border-color: rgba(201,123,134,0.5); }
+.form-textarea { min-height: 120px; }
+.form-select { background: var(--bg2); border: 1px solid var(--border); color: var(--text); padding: 0.9rem 1.2rem; font-family: 'Sora', sans-serif; font-size: 0.9rem; outline: none; }
+
+footer {
+  padding: 2.5rem 4rem; border-top: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+  background: var(--bg); flex-wrap: wrap; gap: 1rem;
+}
+.footer-logo { font-family: 'Big Shoulders Display', sans-serif; font-weight: 800; font-size: 1.1rem; letter-spacing: 0.1em; color: var(--accent); }
+.footer-copy { font-size: 0.7rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+
+@media (max-width: 768px) {
+  nav { padding: 1.1rem 1.5rem; }
+  .nav-links { gap: 1rem; }
+  .nav-links a { font-size: 0.6rem; }
+  .nav-status { display: none; }
+  section { padding: 5rem 1.5rem; }
+  #hero { padding: 0 1.5rem; }
+  .hero-scroll { left: 1.5rem; }
+  .about-grid, .contact-grid { grid-template-columns: 1fr; gap: 3rem; }
+  footer { padding: 2rem 1.5rem; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">NORTHHH<span>.</span></div>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#projects">Work</a></li>
+    <li><a href="#beats">Beats</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="nav-status"><span class="dot"></span> OPEN FOR WORK</div>
+  </div>
+</nav>
+
+<div class="corner-clock" id="navClock">
+  <span class="clock-time" id="clockTime"><span class="clock-dot" id="clockDot"></span>00:00:00</span>
+  <span class="clock-date" id="clockDate">00.00.0000</span>
+</div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-eyebrow">// full stack developer · beatmaker · cybersecurity <span class="blink">▍</span> west africa</div>
+  <div class="hero-title-wrap">
+    <h1 class="hero-title">NORTHHH<span>MASTERS</span></h1>
+    <div class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  </div>
+  <p class="hero-sub">
+    Building products by day. Producing cinematic, melancholic soundscapes by night. Currently building KLAVE, an AI-powered beat marketplace.
+  </p>
+  <div class="hero-cta">
+    <a href="#projects" class="btn btn-primary">View My Work</a>
+    <a href="#contact" class="btn btn-outline">Book Me</a>
+  </div>
+  <div class="hero-scroll">Scroll to explore</div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-label">About</div>
+  <h2 class="section-title">Who I Am</h2>
+  <div class="about-grid">
+    <div class="about-text">
+      <p>I'm <strong>Northhh</strong> (Benedict Patrick) — a full stack developer and beatmaker based in West Africa, building things that feel as good as they look.</p>
+      <p>On the dev side, I build clean, responsive products using HTML, CSS, JavaScript, and Firebase — right now that means <strong>KLAVE</strong>, an AI-powered beat marketplace. On the music side, I produce cinematic, hard-hitting beats under <strong>BEATS BY NORTHHH</strong>.</p>
+      <p>Whether it's a product, a platform, or a fire beat — same energy: intentional, polished, built to last.</p>
+      <div class="about-skills">
+        <span class="skill-tag">HTML / CSS</span>
+        <span class="skill-tag">JavaScript</span>
+        <span class="skill-tag">Firebase</span>
+        <span class="skill-tag">Responsive Design</span>
+        <span class="skill-tag">Beat Production</span>
+        <span class="skill-tag">Branding</span>
+        <span class="skill-tag">Full Stack Development</span>
+        <span class="skill-tag">Git / GitHub</span>
+        <span class="skill-tag">Cybersecurity</span>
+      </div>
+    </div>
+    <div class="about-stats">
+      <div class="stat-box"><div class="stat-num">10+</div><div class="stat-label">Projects Built</div></div>
+      <div class="stat-box"><div class="stat-num">∞</div><div class="stat-label">Beats in the Lab</div></div>
+      <div class="stat-box"><div class="stat-num">1</div><div class="stat-label">Brand. One Vision.</div></div>
+      <div class="stat-box"><div class="stat-num">100%</div><div class="stat-label">Client Focused</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="section-label">Dev Work</div>
+  <h2 class="section-title">Selected Projects</h2>
+  <div class="projects-grid">
+
+    <div class="project-card featured">
+      <div class="project-flag">Currently Building</div>
+      <a href="https://nero-sandy.vercel.app" target="_blank" class="project-arrow">↗</a>
+      <div class="project-title">KLAVE</div>
+      <p class="project-desc">An AI-powered beat marketplace built around a simple idea: in a market flooding with AI-generated music, human-made beats need a home and a way to prove it. KLAVE pairs a producer marketplace with NERO, an integrated AI assistant (powered by Claude), to help artists find and license the right sound.</p>
+      <div class="project-meta">
+        <div><strong>Problem</strong>As AI-generated music floods streaming and marketplaces, producers of 100% human-made beats have no way to stand out or verify authenticity.</div>
+        <div><strong>My Role</strong>Solo founder & builder — product, frontend, backend, and infrastructure.</div>
+        <div><strong>Stack</strong>Firebase Auth + Firestore, Cloudinary, Vercel, Claude API (Anthropic), vanilla JS/HTML/CSS.</div>
+      </div>
+      <div class="project-tags">
+        <span class="project-tag">Firebase</span>
+        <span class="project-tag">Claude API</span>
+        <span class="project-tag">Cloudinary</span>
+        <span class="project-tag">Vercel</span>
+      </div>
+      <div class="project-links">
+        <a href="https://nero-sandy.vercel.app" target="_blank" class="project-link">Live Demo →</a>
+        <a href="https://github.com/beatsbynorth21" target="_blank" class="project-link alt">View on GitHub →</a>
+      </div>
+    </div>
+
+    <div class="project-card">
+      <div class="project-num">Project — 02</div>
+      <a href="https://github.com/beatsbynorth21" target="_blank" class="project-arrow">↗</a>
+      <div class="project-title">Couples Game</div>
+      <p class="project-desc">A real-time remote couples game built with Firebase Realtime Database. Features room codes, multiple game modes, live answer reveals, and Vercel deployment.</p>
+      <div class="project-tags">
+        <span class="project-tag">Firebase</span>
+        <span class="project-tag">JavaScript</span>
+        <span class="project-tag">Realtime DB</span>
+        <span class="project-tag">Vercel</span>
+      </div>
+      <a href="https://github.com/beatsbynorth21" target="_blank" class="project-link">View on GitHub →</a>
+    </div>
+
+    <div class="project-card">
+      <div class="project-num">Project — 03</div>
+      <a href="https://github.com/beatsbynorth21" target="_blank" class="project-arrow">↗</a>
+      <div class="project-title">Emotional Web Experience</div>
+      <p class="project-desc">A personalized interactive website featuring custom vibe meters, animated elements, and a warm cinematic design — built as a heartfelt digital gift.</p>
+      <div class="project-tags">
+        <span class="project-tag">HTML</span>
+        <span class="project-tag">CSS Animations</span>
+        <span class="project-tag">JavaScript</span>
+      </div>
+      <a href="https://github.com/beatsbynorth21" target="_blank" class="project-link">View on GitHub →</a>
+    </div>
+
+    <div class="project-card">
+      <div class="project-num">Project — 04</div>
+      <a href="https://github.com/beatsbynorth21" target="_blank" class="project-arrow">↗</a>
+      <div class="project-title">HTML Milestone Project</div>
+      <p class="project-desc">A full semantic webpage built from a Figma mockup covering structure, multimedia, tables, forms, and accessibility — completed for a frontend development course.</p>
+      <div class="project-tags">
+        <span class="project-tag">Semantic HTML</span>
+        <span class="project-tag">Accessibility</span>
+        <span class="project-tag">Figma</span>
+      </div>
+      <a href="https://github.com/beatsbynorth21" target="_blank" class="project-link">View on GitHub →</a>
+    </div>
+
+    <div class="project-card">
+      <div class="project-num">Project — 05</div>
+      <div class="project-arrow" style="color:var(--muted)">↗</div>
+      <div class="project-title">Catering Business Branding</div>
+      <p class="project-desc">Designed promotional materials and visual branding assets for Heela's Catering Services, including AI-powered flyer prompts and brand identity direction.</p>
+      <div class="project-tags">
+        <span class="project-tag">Branding</span>
+        <span class="project-tag">Design</span>
+        <span class="project-tag">AI Tools</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- BEATS -->
+<section id="beats">
+  <div class="section-label">Music</div>
+  <h2 class="section-title">BEATS BY NORTHHH</h2>
+  <p class="beats-intro">
+    Cinematic. Hard-hitting. Intentional. I produce beats that give artists the perfect foundation to build on. Stream on all major platforms or reach out to license a track.
+  </p>
+  <div class="sc-embed-wrap">
+    <iframe
+      scrolling="no"
+      frameborder="no"
+      allow="autoplay"
+      height="300"
+      src="https://w.soundcloud.com/player/?url=https%3A%2F%2Fsoundcloud.com%2Fnorthhh-169726579&color=%23c97b86&auto_play=false&hide_related=false&show_comments=false&show_user=true&show_reposts=false&show_teaser=false&visual=true">
+    </iframe>
+  </div>
+  <div class="stream-platforms">
+    <div class="stream-label">// Also available on</div>
+    <div class="platform-links">
+      <a href="https://soundcloud.com/northhh-169726579" target="_blank" class="platform-btn">☁ SoundCloud</a>
+      <a href="https://audiomack.com/northhh" target="_blank" class="platform-btn">♪ Audiomack</a>
+      <a href="https://open.spotify.com/artist/7BdhwOtR0sbUeDmM8o2nCF" target="_blank" class="platform-btn">◎ Spotify</a>
+      <a href="https://music.apple.com" target="_blank" class="platform-btn">♫ Apple Music</a>
+    </div>
+  </div>
+  <div class="beats-cta">
+    <a href="#contact" class="btn btn-primary">License a Beat</a>
+    <a href="mailto:Northhhbookings@gmail.com" class="btn btn-outline">Custom Beat Request</a>
+    <span class="beats-note">// Exclusive & non-exclusive licenses available</span>
+  </div>
+</section>
+
+<!-- CONTACT / BOOKING -->
+<section id="contact">
+  <div class="section-label">Let's Work</div>
+  <h2 class="section-title">Get In Touch</h2>
+
+  <div class="booking-status"><span class="dot"></span> CURRENTLY BOOKING — WEB BUILDS, BEAT LICENSING & COLLABS</div>
+
+  <div class="contact-grid">
+    <div class="contact-left">
+      <p>Whether you need a product built, a beat licensed, or a full creative partner — I'm open for freelance work, collaborations, and long-term projects. Let's build something great.</p>
+      <div class="booking-tags">
+        <span class="booking-tag">Web Development</span>
+        <span class="booking-tag">Beat Licensing</span>
+        <span class="booking-tag">Custom Production</span>
+        <span class="booking-tag">Brand & Landing Pages</span>
+      </div>
+      <div class="contact-links">
+        <a href="https://wa.me/2348166435486" target="_blank" class="contact-link priority">
+          <span class="contact-link-icon">💬</span> Book via WhatsApp — fastest response
+        </a>
+        <a href="mailto:Northhhbookings@gmail.com" class="contact-link">
+          <span class="contact-link-icon">✉</span> Northhhbookings@gmail.com
+        </a>
+        <a href="https://x.com/Beatsbynorthhh" target="_blank" class="contact-link">
+          <span class="contact-link-icon">𝕏</span> @Beatsbynorthhh
+        </a>
+        <a href="https://www.tiktok.com/@Northhh_zzz" target="_blank" class="contact-link">
+          <span class="contact-link-icon">♾</span> @Northhh_zzz on TikTok
+        </a>
+        <a href="https://www.linkedin.com/in/benedict-patrick-19b2753a9" target="_blank" class="contact-link">
+          <span class="contact-link-icon">in</span> LinkedIn — Benedict Patrick
+        </a>
+        <a href="https://github.com/beatsbynorth21" target="_blank" class="contact-link">
+          <span class="contact-link-icon">◈</span> github.com/beatsbynorth21
+        </a>
+      </div>
+    </div>
+    <div>
+      <div class="contact-form">
+        <div class="form-group">
+          <label class="form-label">Your Name</label>
+          <input type="text" class="form-input" placeholder="John Doe" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" placeholder="you@email.com" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">What do you need?</label>
+          <select class="form-select">
+            <option>Web Development</option>
+            <option>Beat License / Custom Beat</option>
+            <option>Collab / Partnership</option>
+            <option>Something Else</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Details</label>
+          <textarea class="form-textarea" placeholder="Tell me about your project, beat request, or collab idea..."></textarea>
+        </div>
+        <button class="btn btn-primary" style="align-self:flex-start" onclick="window.location.href='mailto:Northhhbookings@gmail.com'">
+          Send Message →
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">BEATS BY NORTHHH</div>
+  <div class="footer-copy">© 2026 Benedict Patrick — All rights reserved</div>
+</footer>
+
+<script>
+(function() {
+  const timeTextEl = document.getElementById('clockTime');
+  const dateEl = document.getElementById('clockDate');
+  const dotEl = document.getElementById('clockDot');
+  const pad = n => String(n).padStart(2, '0');
+  function tick() {
+    const now = new Date();
+    const seconds = now.getSeconds();
+    timeTextEl.childNodes[1].nodeValue = ` ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(seconds)}`;
+    dateEl.textContent = `${pad(now.getDate())}.${pad(now.getMonth() + 1)}.${now.getFullYear()}`;
+    dotEl.classList.toggle('off', seconds % 2 === 0);
+  }
+  tick();
+  setInterval(tick, 1000);
+})();
+</script>
+</body>
+</html>
