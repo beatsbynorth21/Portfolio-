@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Northhh · Full Stack Developer & Beatmaker</title>
+<meta name="description" content="Benedict Patrick (Northhh) — full stack developer, beatmaker, and cybersecurity practitioner building KLAVE."/>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@600;700&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #131210;
+  --bg2: #1a1815;
+  --text: #f5f2ec;
+  --muted: #9a9488;
+  --border: rgba(255,255,255,0.12);
+  --brown: #5c4014;
+  --brown2: #4a1010;
+  --green: #0e3a1e;
+  --red: #a11f1f;
+  --blue: #16305c;
+  --blue2: #1b4a8a;
+  --accent: #39ff6a;
+}
+body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+a { color: inherit; text-decoration: none; }
+
+/* CUSTOM CURSOR */
+@media (hover: hover) and (pointer: fine) {
+  body { cursor: none; }
+  a, button, select, input, textarea, .menu-btn, .btn-contact { cursor: none; }
+}
+.cursor-ring {
+  position: fixed; top: 0; left: 0; width: 28px; height: 28px; border: 2px solid var(--accent);
+  border-radius: 50%; pointer-events: none; z-index: 999; transform: translate(-50%, -50%);
+  transition: width 0.2s ease, height 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+  mix-blend-mode: difference;
+}
+.cursor-ring.hovering { width: 52px; height: 52px; background: rgba(57,255,106,0.15); }
+.cursor-dot {
+  position: fixed; top: 0; left: 0; width: 5px; height: 5px; background: var(--accent);
+  border-radius: 50%; pointer-events: none; z-index: 999; transform: translate(-50%, -50%);
+}
+@media (hover: none), (pointer: coarse) { .cursor-ring, .cursor-dot { display: none; } }
+
+/* TOP BAR */
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 1.1rem 1.5rem; background: rgba(19,18,16,0.85); backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+.logo-mark { width: 34px; height: 20px; border: 3px solid var(--muted); border-bottom: none; border-radius: 20px 20px 0 0; opacity: 0.8; }
+.menu-btn {
+  display: flex; align-items: center; gap: 0.7rem; background: var(--bg2); border: 1px solid var(--border);
+  color: var(--text); font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 0.75rem;
+  letter-spacing: 0.1em; padding: 0.6rem 1.1rem; cursor: pointer;
+}
+.menu-btn .bars { display: flex; flex-direction: column; gap: 3px; }
+.menu-btn .bars span { width: 18px; height: 2px; background: var(--text); }
+
+/* RULER */
+.ruler-track {
+  position: fixed; top: 56px; left: 0; right: 0; height: 46px; z-index: 90;
+  background: rgba(19,18,16,0.85); border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
+.ruler-strip { position: absolute; top: 0; left: 0; height: 100%; will-change: transform; }
+.tick { position: absolute; top: 8px; width: 1px; background: var(--muted); opacity: 0.5; }
+.tick.minor { height: 8px; }
+.tick.major { height: 14px; opacity: 0.9; }
+.tick-label { position: absolute; top: 24px; transform: translateX(-50%); font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; color: var(--muted); letter-spacing: 0.05em; white-space: nowrap; }
+
+.corner-clock {
+  position: fixed; top: 112px; right: 1rem; z-index: 90;
+  font-family: 'JetBrains Mono', monospace; text-align: right; line-height: 1.4;
+  background: rgba(19,18,16,0.75); padding: 0.35rem 0.7rem; border: 1px solid var(--border);
+  pointer-events: none;
+}
+.corner-clock .clock-time { display: block; color: var(--text); font-size: 0.78rem; font-weight: 500; letter-spacing: 0.06em; }
+.corner-clock .clock-time .clock-dot {
+  display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--accent);
+  margin-right: 0.5rem; vertical-align: middle; box-shadow: 0 0 6px var(--accent), 0 0 12px rgba(57,255,106,0.5);
+  opacity: 1; transition: opacity 0.9s ease-in-out;
+}
+.corner-clock .clock-time .clock-dot.off { opacity: 0.12; }
+.corner-clock .clock-date { display: block; color: var(--muted); font-size: 0.56rem; letter-spacing: 0.1em; margin-top: 0.1rem; }
+@media (max-width: 600px) { .corner-clock { top: 108px; right: 0.6rem; padding: 0.3rem 0.55rem; } }
+
+/* SLIDE MENU */
+.slide-menu {
+  position: fixed; inset: 0; z-index: 200; background: rgba(10,10,9,0.98);
+  display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
+  padding: 2rem 2rem 2rem 2.2rem; gap: 1.2rem;
+  transform: translateY(-100%); transition: transform 0.4s ease;
+}
+.slide-menu.open { transform: translateY(0); }
+.slide-menu a { font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 2.4rem; color: var(--text); }
+.slide-menu a:hover { color: var(--accent); }
+.menu-close { position: absolute; top: 1.1rem; right: 1.5rem; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; border: 1px solid var(--border); padding: 0.5rem 0.9rem; cursor: pointer; background: transparent; color: var(--text); }
+.menu-lang { margin-top: 1rem; }
+.menu-lang select {
+  background: var(--bg2); color: var(--text); border: 1px solid var(--border);
+  font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; padding: 0.5rem 0.8rem;
+}
+
+.wrap { padding-top: 104px; }
+section { padding: 5rem 1.5rem; position: relative; }
+
+/* HERO */
+#hero { min-height: 78vh; display: flex; flex-direction: column; justify-content: center; padding-top: 2rem; }
+.hero-name {
+  font-family: 'Baloo 2', sans-serif; font-weight: 800;
+  font-size: clamp(2.6rem, 10vw, 5.5rem); line-height: 1.02; margin-bottom: 1.6rem;
+}
+.sticker-row { display: flex; flex-wrap: wrap; gap: 1.6rem; margin-bottom: 2.2rem; }
+.sticker {
+  position: relative; display: inline-flex; align-items: center; padding: 0.65rem 1.3rem;
+  font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 0.78rem; letter-spacing: 0.08em;
+  border-radius: 30px; color: var(--text); box-shadow: 3px 3px 0 rgba(0,0,0,0.4);
+}
+.sticker.loc { background: var(--red); transform: rotate(2deg); }
+.sticker.role { background: var(--brown); transform: rotate(-2deg); }
+.sticker::before {
+  content: ''; position: absolute; left: -6px; top: -8px; width: 0; height: 0;
+  border-left: 7px solid transparent; border-right: 7px solid transparent; border-bottom: 14px solid;
+}
+.sticker.loc::before { border-bottom-color: #ff6b6b; transform: rotate(20deg); }
+.sticker.role::before { border-bottom-color: #d9a441; transform: rotate(-25deg); }
+
+.hero-headline {
+  font-family: 'Baloo 2', sans-serif; font-weight: 700;
+  font-size: clamp(1.7rem, 5vw, 2.7rem); line-height: 1.35; max-width: 780px; margin-bottom: 2.4rem;
+}
+.hero-headline .icon { display: inline-block; }
+.btn-contact {
+  display: inline-flex; align-items: center; gap: 0.8rem; background: var(--bg2); border: 1px solid var(--border);
+  padding: 0.7rem 1.4rem 0.7rem 0.7rem; cursor: pointer; font-family: 'JetBrains Mono', monospace;
+  font-weight: 700; font-size: 0.8rem; letter-spacing: 0.08em; color: var(--text);
+}
+.btn-contact .sq { width: 30px; height: 30px; background: var(--blue2); border: 2px solid var(--red); display: flex; align-items: center; justify-content: center; }
+.btn-contact .sq svg { width: 14px; height: 14px; }
+
+/* WAVE DIVIDER */
+.wave-divider { width: 100%; height: 40px; }
+.wave-divider svg { width: 100%; height: 100%; }
+
+/* ABOUT */
+.script-label { font-family: 'Caveat', cursive; font-weight: 700; font-size: 1.9rem; color: var(--text); margin-bottom: 1.6rem; }
+.marker-block {
+  padding: 1.6rem 1.8rem; color: #fff; font-size: 1.02rem; font-weight: 400; line-height: 1.75;
+  margin-bottom: 1.6rem; max-width: 640px; box-shadow: 4px 4px 0 rgba(0,0,0,0.35);
+  clip-path: polygon(1.5% 4%, 100% 0%, 98.5% 96%, 0% 100%);
+}
+.marker-block.b1 { background: var(--brown); transform: rotate(-0.6deg); }
+.marker-block.b2 { background: var(--green); transform: rotate(0.6deg); }
+.marker-block strong { font-weight: 700; }
+
+.tag-blocks { display: flex; flex-direction: column; gap: 0.9rem; align-items: flex-start; margin-top: 2rem; }
+.tag-block-row { display: flex; align-items: center; gap: 0.9rem; }
+.tag-block {
+  font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 1.05rem; color: #fff;
+  padding: 0.9rem 1.8rem; box-shadow: 3px 3px 0 rgba(0,0,0,0.35);
+}
+.tag-block.brown { background: var(--brown2); }
+.tag-block.green { background: var(--green); }
+.tag-block.red { background: var(--red); }
+.tag-block.blue { background: var(--blue); }
+.tag-icon { width: 42px; height: 42px; border: 2px dashed var(--muted); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.tag-icon svg { width: 20px; height: 20px; }
+
+/* WORK */
+#work { padding: 0; }
+.work-item { position: relative; padding: 4.5rem 1.5rem 3.5rem; }
+.work-item.band {
+  clip-path: polygon(0 4%, 100% 0%, 100% 96%, 0% 100%);
+  margin-bottom: -3rem;
+}
+.work-item.blue-band { background: var(--blue2); }
+.work-item.black-band { background: #0c0b0a; border-top: 1px solid var(--border); }
+.proj-flag { display: inline-flex; align-items: center; gap: 0.6rem; font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 0.85rem; letter-spacing: 0.12em; margin-bottom: 1.2rem; }
+.proj-tags { display: flex; align-items: center; gap: 0.6rem; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; letter-spacing: 0.12em; color: var(--muted); text-transform: uppercase; margin-bottom: 1rem; }
+.proj-tags .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+.proj-title { font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: clamp(1.8rem, 6vw, 3rem); margin-bottom: 1.2rem; }
+.proj-desc { color: var(--muted); font-size: 0.98rem; line-height: 1.8; max-width: 600px; margin-bottom: 1rem; font-weight: 300; }
+.proj-role { color: var(--muted); font-size: 0.88rem; line-height: 1.75; max-width: 600px; margin-bottom: 1.6rem; }
+.proj-role strong { color: var(--text); }
+.proj-link { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; letter-spacing: 0.1em; border-bottom: 1px solid var(--text); padding-bottom: 3px; }
+.proj-link:hover { color: var(--accent); border-color: var(--accent); }
+
+/* BEATS */
+#beats { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.sc-embed-wrap { border: 1px solid var(--border); overflow: hidden; margin-bottom: 1.8rem; }
+.sc-embed-wrap iframe { width: 100%; display: block; }
+.platform-links { display: flex; gap: 0.7rem; flex-wrap: wrap; margin-bottom: 1.8rem; }
+.platform-btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.1rem; border: 1px solid var(--border); font-size: 0.72rem; font-family: 'JetBrains Mono', monospace; color: var(--text); }
+.platform-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* CONTACT */
+.contact-links { display: flex; flex-direction: column; gap: 0.7rem; margin: 1.6rem 0 2rem; max-width: 480px; }
+.contact-link { display: flex; align-items: center; gap: 1rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; padding: 0.85rem 1.1rem; border: 1px solid var(--border); }
+.contact-link:hover { border-color: var(--accent); color: var(--accent); }
+.contact-link.priority { color: var(--text); border-color: rgba(255,255,255,0.25); }
+.booking-status { display: inline-flex; align-items: center; gap: 0.6rem; border: 1px solid var(--border); padding: 0.6rem 1.1rem; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--muted); margin-bottom: 1.8rem; }
+.booking-status .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.form-group { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1rem; max-width: 480px; }
+.form-label { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.form-input, .form-textarea, .form-select { background: var(--bg2); border: 1px solid var(--border); color: var(--text); padding: 0.8rem 1rem; font-family: 'Inter', sans-serif; font-size: 0.9rem; outline: none; }
+.form-textarea { min-height: 110px; resize: none; }
+.form-input:focus, .form-textarea:focus { border-color: var(--accent); }
+
+footer { padding: 2.2rem 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+.footer-avatar { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 0.75rem; }
+.footer-left { display: flex; align-items: center; gap: 0.9rem; }
+.footer-name { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; }
+.footer-copy { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; color: var(--muted); }
+.footer-social { display: flex; gap: 0.9rem; }
+.footer-social a { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; color: var(--muted); }
+.footer-social a:hover { color: var(--accent); }
+
+@media (min-width: 780px) {
+  section { padding: 6rem 4rem; }
+  .work-item { padding: 6rem 4rem 4.5rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="cursor-dot" id="cursorDot"></div>
+
+<div class="topbar">
+  <div class="logo-mark"></div>
+  <button class="menu-btn" id="menuBtn"><span data-i18n="menu_label">MENU</span> <span class="bars"><span></span><span></span><span></span></span></button>
+</div>
+
+<div class="ruler-track"><div class="ruler-strip" id="rulerStrip"></div></div>
+
+<div class="corner-clock" id="navClock">
+  <span class="clock-time" id="clockTime"><span class="clock-dot" id="clockDot"></span>00:00:00</span>
+  <span class="clock-date" id="clockDate">00.00.0000</span>
+</div>
+
+<div class="slide-menu" id="slideMenu">
+  <button class="menu-close" id="menuClose">CLOSE ✕</button>
+  <a href="#hero" data-i18n="nav_home">Home</a>
+  <a href="#about" data-i18n="nav_about">About</a>
+  <a href="#work" data-i18n="nav_work">Work</a>
+  <a href="#beats" data-i18n="nav_beats">Beats</a>
+  <a href="#contact" data-i18n="nav_contact">Contact</a>
+  <div class="menu-lang">
+    <select id="langSwitch">
+      <option value="en">EN</option>
+      <option value="zh">中文</option>
+      <option value="ru">RU</option>
+      <option value="pt">PT</option>
+      <option value="es">ES</option>
+      <option value="fr">FR</option>
+      <option value="de">DE</option>
+      <option value="ar">AR</option>
+      <option value="ja">日本語</option>
+    </select>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <section id="hero">
+    <h1 class="hero-name">NORTHHH</h1>
+    <div class="sticker-row">
+      <div class="sticker loc" data-i18n="hero_loc">WEST AFRICA</div>
+      <div class="sticker role" data-i18n="hero_role_sticker">FULL STACK DEVELOPER</div>
+    </div>
+    <p class="hero-headline"><span data-i18n="hero_headline">I build 🎯 the products behind marketplaces and creative platforms 🎵.</span></p>
+    <a href="#contact" class="btn-contact">
+      <span class="sq"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      <span data-i18n="btn_contact">CONTACT ME</span>
+    </a>
+  </section>
+
+  <div class="wave-divider">
+    <svg viewBox="0 0 1200 40" preserveAspectRatio="none"><path d="M0,20 C150,0 300,40 450,20 C600,0 750,40 900,20 C1050,0 1150,10 1200,20" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" fill="none"/></svg>
+  </div>
+
+  <section id="about">
+    <div class="script-label" data-i18n="about_label">about me!</div>
+    <div class="marker-block b1" data-i18n="about_p1"><strong>Northhh</strong> (Benedict Patrick) — full stack developer, beatmaker, and cybersecurity practitioner based in West Africa.</div>
+    <div class="marker-block b2" data-i18n="about_p2">Right now heads-down on <strong>KLAVE</strong>, an AI-powered beat marketplace built solo — product, frontend, backend, and infrastructure. Alongside that: freelance web builds and cinematic beats under <strong>Beats By Northhh</strong>.</div>
+    <div class="tag-blocks">
+      <div class="tag-block-row">
+        <div class="tag-block brown" data-i18n="tag_fullstack">Full Stack Development</div>
+        <div class="tag-icon"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16l-6.5 5 2-7.5L2 9h7z"/></svg></div>
+      </div>
+      <div class="tag-block-row"><div class="tag-block green" data-i18n="tag_cyber">Cybersecurity</div></div>
+      <div class="tag-block-row">
+        <div class="tag-block red" data-i18n="tag_beat">Beat Production</div>
+        <div class="tag-icon"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2l3 7h7l-5.5 4.5L18.5 21 12 16l-6.5 5 2-7.5L2 9h7z"/></svg></div>
+      </div>
+      <div class="tag-block-row"><div class="tag-block blue" data-i18n="tag_brand">Branding</div></div>
+    </div>
+  </section>
+
+  <section id="work">
+    <div class="work-item band blue-band">
+      <div class="proj-flag" data-i18n="proj_current">✦ CURRENTLY BUILDING</div>
+    </div>
+    <div class="work-item black-band">
+      <div class="proj-tags"><span class="dot"></span> <span data-i18n="w1_tags">AI MARKETPLACE · FIREBASE</span></div>
+      <div class="proj-title">KLAVE</div>
+      <p class="proj-desc" data-i18n="w1_desc">An AI-powered beat marketplace built for a market flooding with AI-generated music — pairing a producer marketplace with NERO, an integrated AI assistant powered by Claude, to help artists find and license the right sound.</p>
+      <p class="proj-role" data-i18n="w1_role"><strong>Role:</strong> Solo founder & builder. <strong>Stack:</strong> Firebase Auth + Firestore, Cloudinary, Vercel, Claude API.</p>
+      <a href="https://nero-sandy.vercel.app" target="_blank" class="proj-link" data-i18n="link_view">VIEW PROJECT ↗</a>
+    </div>
+    <div class="work-item black-band" style="padding-top:2rem;">
+      <div class="proj-tags"><span class="dot" style="background:#d9a441;"></span> <span data-i18n="w2_tags">REALTIME · FIREBASE</span></div>
+      <div class="proj-title" style="font-size:1.8rem;">Couples Game</div>
+      <p class="proj-desc" data-i18n="w2_desc">A real-time remote couples game with room codes, multiple game modes, and live answer reveals — built on Firebase Realtime Database and deployed on Vercel.</p>
+      <a href="https://github.com/beatsbynorth21" target="_blank" class="proj-link" data-i18n="link_view">VIEW PROJECT ↗</a>
+    </div>
+    <div class="work-item black-band" style="padding-top:2rem;">
+      <div class="proj-tags"><span class="dot" style="background:#a11f1f;"></span> <span data-i18n="w3_tags">INTERACTIVE · FRONTEND</span></div>
+      <div class="proj-title" style="font-size:1.8rem;">Emotional Web Experience</div>
+      <p class="proj-desc" data-i18n="w3_desc">A personalized interactive site with custom vibe meters, animated elements, and a warm cinematic design — built as a heartfelt digital gift.</p>
+      <a href="https://github.com/beatsbynorth21" target="_blank" class="proj-link" data-i18n="link_view">VIEW PROJECT ↗</a>
+    </div>
+    <div class="work-item black-band" style="padding-top:2rem;">
+      <div class="proj-tags"><span class="dot" style="background:#16305c;"></span> <span data-i18n="w4_tags">SEMANTIC HTML · A11Y</span></div>
+      <div class="proj-title" style="font-size:1.8rem;">HTML Milestone Project</div>
+      <p class="proj-desc" data-i18n="w4_desc">A full semantic webpage built from a Figma mockup — structure, multimedia, tables, forms, and accessibility, completed for a frontend development course.</p>
+      <a href="https://github.com/beatsbynorth21" target="_blank" class="proj-link" data-i18n="link_view">VIEW PROJECT ↗</a>
+    </div>
+    <div class="work-item black-band" style="padding-top:2rem;">
+      <div class="proj-tags"><span class="dot" style="background:#0e3a1e;"></span> <span data-i18n="w5_tags">BRANDING · DESIGN</span></div>
+      <div class="proj-title" style="font-size:1.8rem;">Catering Business Branding</div>
+      <p class="proj-desc" data-i18n="w5_desc">Promotional materials and visual brand identity for Heela's Catering Services, including AI-powered flyer prompts and direction.</p>
+    </div>
+  </section>
+
+  <section id="beats">
+    <div class="script-label" data-i18n="beats_label">on the side</div>
+    <h2 style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(1.8rem,5vw,2.8rem);margin-bottom:1.2rem;">Beats By Northhh</h2>
+    <p class="proj-desc" data-i18n="beats_sub" style="margin-bottom:1.8rem;">Cinematic, hard-hitting beats. Stream on all major platforms, or reach out to license a track.</p>
+    <div class="sc-embed-wrap">
+      <iframe scrolling="no" frameborder="no" allow="autoplay" height="300"
+        src="https://w.soundcloud.com/player/?url=https%3A%2F%2Fsoundcloud.com%2Fnorthhh-169726579&color=%2339ff6a&auto_play=false&hide_related=false&show_comments=false&show_user=true&show_reposts=false&show_teaser=false&visual=true">
+      </iframe>
+    </div>
+    <div class="platform-links">
+      <a href="https://soundcloud.com/northhh-169726579" target="_blank" class="platform-btn">☁ SoundCloud</a>
+      <a href="https://audiomack.com/northhh" target="_blank" class="platform-btn">♪ Audiomack</a>
+      <a href="https://open.spotify.com/artist/7BdhwOtR0sbUeDmM8o2nCF" target="_blank" class="platform-btn">◎ Spotify</a>
+      <a href="https://music.apple.com" target="_blank" class="platform-btn">♫ Apple Music</a>
+    </div>
+    <a href="#contact" class="btn-contact"><span class="sq"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span> <span data-i18n="btn_license">LICENSE A BEAT</span></a>
+  </section>
+
+  <section id="contact">
+    <div class="script-label" data-i18n="contact_label">let's talk</div>
+    <h2 style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(1.8rem,5vw,2.8rem);margin-bottom:1rem;" data-i18n="contact_title">Get In Touch</h2>
+    <p class="proj-desc" data-i18n="contact_sub" style="margin-bottom:1.6rem;">Open to new work — web builds, beat licensing, and collabs. Email or WhatsApp is the fastest way to reach me.</p>
+    <div class="booking-status"><span class="dot"></span> <span data-i18n="booking_status">Currently booking</span></div>
+    <div class="contact-links">
+      <a href="https://wa.me/2348166435486" target="_blank" class="contact-link priority" data-i18n="contact_whatsapp">WhatsApp — fastest response</a>
+      <a href="mailto:Northhhbookings@gmail.com" class="contact-link">Northhhbookings@gmail.com</a>
+      <a href="https://x.com/Beatsbynorthhh" target="_blank" class="contact-link">@Beatsbynorthhh on X</a>
+      <a href="https://www.tiktok.com/@Northhh_zzz" target="_blank" class="contact-link">@Northhh_zzz on TikTok</a>
+      <a href="https://www.linkedin.com/in/benedict-patrick-19b2753a9" target="_blank" class="contact-link" data-i18n="contact_linkedin">LinkedIn — Benedict Patrick</a>
+      <a href="https://github.com/beatsbynorth21" target="_blank" class="contact-link">github.com/beatsbynorth21</a>
+    </div>
+    <div class="form-group">
+      <label class="form-label" data-i18n="form_name_label">Your Name</label>
+      <input type="text" class="form-input" data-i18n-ph="form_name_ph" placeholder="John Doe" />
+    </div>
+    <div class="form-group">
+      <label class="form-label" data-i18n="form_email_label">Email</label>
+      <input type="email" class="form-input" data-i18n-ph="form_email_ph" placeholder="you@email.com" />
+    </div>
+    <div class="form-group">
+      <label class="form-label" data-i18n="form_need_label">What do you need?</label>
+      <select class="form-select">
+        <option data-i18n="opt_web">Web Development</option>
+        <option data-i18n="opt_beat">Beat License / Custom Beat</option>
+        <option data-i18n="opt_collab">Collab / Partnership</option>
+        <option data-i18n="opt_other">Something Else</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label" data-i18n="form_details_label">Details</label>
+      <textarea class="form-textarea" data-i18n-ph="form_details_ph" placeholder="Tell me about your project, beat request, or collab idea..."></textarea>
+    </div>
+    <button class="btn-contact" onclick="window.location.href='mailto:Northhhbookings@gmail.com'">
+      <span class="sq"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      <span data-i18n="btn_send">SEND MESSAGE</span>
+    </button>
+  </section>
+
+  <footer>
+    <div class="footer-left">
+      <div class="footer-avatar">BP</div>
+      <div>
+        <div class="footer-name">Benedict Patrick</div>
+        <div class="footer-copy" data-i18n="footer_copy">© 2026 Northhh — All rights reserved</div>
+      </div>
+    </div>
+    <div class="footer-social">
+      <a href="mailto:Northhhbookings@gmail.com">Email</a>
+      <a href="https://github.com/beatsbynorth21" target="_blank">GitHub</a>
+      <a href="https://x.com/Beatsbynorthhh" target="_blank">X</a>
+      <a href="https://www.linkedin.com/in/benedict-patrick-19b2753a9" target="_blank">LinkedIn</a>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+(function() {
+  const strip = document.getElementById('rulerStrip');
+  const docHeight = () => document.documentElement.scrollHeight + 1500;
+  const spacing = 20;
+  const majorEvery = 5;
+  let ticks = [];
+  function build() {
+    strip.innerHTML = '';
+    const total = docHeight();
+    for (let x = 0; x <= total; x += spacing) {
+      const isMajor = (x / spacing) % majorEvery === 0;
+      const t = document.createElement('div');
+      t.className = 'tick ' + (isMajor ? 'major' : 'minor');
+      t.style.left = x + 'px';
+      strip.appendChild(t);
+      if (isMajor) {
+        const l = document.createElement('div');
+        l.className = 'tick-label';
+        l.style.left = x + 'px';
+        l.textContent = x;
+        strip.appendChild(l);
+      }
+    }
+  }
+  build();
+  function update() {
+    strip.style.transform = `translateX(${-window.scrollY}px)`;
+  }
+  update();
+  window.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('resize', () => { build(); update(); });
+})();
+
+(function() {
+  const menuBtn = document.getElementById('menuBtn');
+  const menuClose = document.getElementById('menuClose');
+  const slideMenu = document.getElementById('slideMenu');
+  menuBtn.addEventListener('click', () => slideMenu.classList.add('open'));
+  menuClose.addEventListener('click', () => slideMenu.classList.remove('open'));
+  slideMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => slideMenu.classList.remove('open')));
+})();
+
+(function() {
+  const timeTextEl = document.getElementById('clockTime');
+  const dateEl = document.getElementById('clockDate');
+  const dotEl = document.getElementById('clockDot');
+  const pad = n => String(n).padStart(2, '0');
+  function tick() {
+    const now = new Date();
+    const seconds = now.getSeconds();
+    timeTextEl.childNodes[1].nodeValue = ` ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(seconds)}`;
+    dateEl.textContent = `${pad(now.getDate())}.${pad(now.getMonth() + 1)}.${now.getFullYear()}`;
+    dotEl.classList.toggle('off', seconds % 2 === 0);
+  }
+  tick();
+  setInterval(tick, 1000);
+})();
+</script>
+
+<script>
+const translations = {
+  en: {
+    menu_label:"MENU",
+    nav_contact:"Contact",
+    hero_role_sticker:"FULL STACK DEVELOPER",
+    hero_headline:"I build 🎯 the products behind marketplaces and creative platforms 🎵.",
+    proj_current:"✦ CURRENTLY BUILDING",
+    nav_home:"Home", nav_about:"About", nav_work:"Work", nav_beats:"Beats",
+    hero_label:"my name is Northhh", hero_tagline:"Currently building KLAVE · Freelance web builds & beat licensing on the side",
+    badge_available:"AVAILABLE FOR NEW WORK", hero_loc:"WEST AFRICA", hero_role:"Full Stack Developer / Beatmaker / Cybersecurity",
+    hero_pitch:"I build the products behind marketplaces and creative platforms — then produce the soundtrack for them after hours.",
+    btn_contact:"Contact Me",
+    about_label:"about me!", about_title:"What's up",
+    about_p1:"I'm <strong>Northhh</strong> (Benedict Patrick) — a full stack developer, beatmaker, and cybersecurity practitioner based in West Africa.",
+    about_p2:"Right now I'm heads-down on <strong>KLAVE</strong>, an AI-powered beat marketplace I'm building solo — product, frontend, backend, and infrastructure. Alongside that, I take on freelance web builds and produce cinematic, hard-hitting beats under <strong>Beats By Northhh</strong>.",
+    about_p3:"Same approach either way: take something complicated, pull it apart, and rebuild it so it just works.",
+    tag_fullstack:"Full Stack Development", tag_cyber:"Cybersecurity", tag_beat:"Beat Production", tag_brand:"Branding",
+    work_label:"explore my work!", work_title:"Featured Work", work_sub:"Marketplaces, real-time apps, and brand builds — built end to end.",
+    w1_tags:"AI Marketplace · Firebase", w1_desc:"An AI-powered beat marketplace built for a market flooding with AI-generated music — pairing a producer marketplace with NERO, an integrated AI assistant powered by Claude, to help artists find and license the right sound.",
+    w1_role:"<strong>Role:</strong> Solo founder & builder. <strong>Stack:</strong> Firebase Auth + Firestore, Cloudinary, Vercel, Claude API.",
+    link_view:"View Project ↗",
+    w2_tags:"Realtime · Firebase", w2_desc:"A real-time remote couples game with room codes, multiple game modes, and live answer reveals — built on Firebase Realtime Database and deployed on Vercel.",
+    w3_tags:"Interactive · Frontend", w3_desc:"A personalized interactive site with custom vibe meters, animated elements, and a warm cinematic design — built as a heartfelt digital gift.",
+    w4_tags:"Semantic HTML · A11y", w4_desc:"A full semantic webpage built from a Figma mockup — structure, multimedia, tables, forms, and accessibility, completed for a frontend development course.",
+    w5_tags:"Branding · Design", w5_desc:"Promotional materials and visual brand identity for Heela's Catering Services, including AI-powered flyer prompts and direction.",
+    beats_label:"on the side", beats_sub:"Cinematic, hard-hitting beats. Stream on all major platforms, or reach out to license a track.", btn_license:"License a Beat",
+    contact_label:"let's talk", contact_title:"Get In Touch", contact_sub:"Open to new work — web builds, beat licensing, and collabs. Email or WhatsApp is the fastest way to reach me.",
+    booking_status:"Currently booking", contact_whatsapp:"WhatsApp — fastest response", contact_linkedin:"LinkedIn — Benedict Patrick",
+    form_name_label:"Your Name", form_name_ph:"John Doe", form_email_label:"Email", form_email_ph:"you@email.com",
+    form_need_label:"What do you need?", opt_web:"Web Development", opt_beat:"Beat License / Custom Beat", opt_collab:"Collab / Partnership", opt_other:"Something Else",
+    form_details_label:"Details", form_details_ph:"Tell me about your project, beat request, or collab idea...", btn_send:"Send Message →",
+    footer_copy:"© 2026 Northhh — All rights reserved"
+  },
+  zh: {
+    menu_label:"菜单",
+    nav_contact:"联系",
+    hero_role_sticker:"全栈开发者",
+    hero_headline:"我构建 🎯 支撑市场平台与创意产品的系统 🎵。",
+    proj_current:"✦ 正在开发中",
+    nav_home:"主页", nav_about:"关于", nav_work:"作品", nav_beats:"音乐",
+    hero_label:"我叫 Northhh", hero_tagline:"目前正在开发 KLAVE · 同时接自由网站建设和曲目授权项目",
+    badge_available:"接受新工作", hero_loc:"西非", hero_role:"全栈开发者 / 音乐制作人 / 网络安全",
+    hero_pitch:"我白天构建市场和创意平台背后的产品——晚上为它们创作配乐。",
+    btn_contact:"联系我",
+    about_label:"关于我!", about_title:"近况",
+    about_p1:"我是 <strong>Northhh</strong>(本尼迪克特·帕特里克)——一名全栈开发者、音乐制作人和网络安全从业者,现居西非。",
+    about_p2:"目前我正专注于 <strong>KLAVE</strong>,一个由人工智能驱动的曲目交易平台,由我独立开发——产品、前端、后端和基础设施全部一人完成。除此之外,我也承接自由网站建设项目,并以 <strong>Beats By Northhh</strong> 的名义制作电影感十足、节奏强劲的曲目。",
+    about_p3:"无论做什么,方法都一样:把复杂的事情拆开,再重新组装,让它真正好用。",
+    tag_fullstack:"全栈开发", tag_cyber:"网络安全", tag_beat:"曲目制作", tag_brand:"品牌设计",
+    work_label:"探索我的作品!", work_title:"精选作品", work_sub:"市场平台、实时应用与品牌项目——从头到尾一手打造。",
+    w1_tags:"人工智能市场 · Firebase", w1_desc:"一个专为应对人工智能生成音乐泛滥而打造的曲目交易平台——将制作人市场与由 Claude 驱动的人工智能助手 NERO 相结合,帮助艺术家找到并授权合适的曲目。",
+    w1_role:"<strong>角色:</strong>独立创始人兼开发者。<strong>技术栈:</strong>Firebase Auth + Firestore、Cloudinary、Vercel、Claude API。",
+    link_view:"查看项目 ↗",
+    w2_tags:"实时应用 · Firebase", w2_desc:"一款基于 Firebase 实时数据库的情侣互动游戏,支持房间码、多种游戏模式和实时答案揭晓,部署于 Vercel。",
+    w3_tags:"互动体验 · 前端", w3_desc:"一个带有自定义情绪计、动画元素和温暖电影感设计的个性化互动网站——作为一份走心的数字礼物打造。",
+    w4_tags:"语义化 HTML · 无障碍", w4_desc:"根据 Figma 设计稿构建的完整语义化网页——涵盖结构、多媒体、表格、表单和无障碍设计,为前端开发课程完成的作品。",
+    w5_tags:"品牌 · 设计", w5_desc:"为 Heela's Catering Services 设计的宣传物料与视觉品牌形象,包括人工智能生成的传单方案与整体设计方向。",
+    beats_label:"业余项目", beats_sub:"电影感十足、节奏强劲的曲目。可在各大平台收听,或联系我进行曲目授权。", btn_license:"授权曲目",
+    contact_label:"聊聊吧", contact_title:"联系方式", contact_sub:"欢迎新的合作——网站建设、曲目授权和联名项目。邮件或 WhatsApp 是联系我最快的方式。",
+    booking_status:"目前接受预约", contact_whatsapp:"WhatsApp——响应最快", contact_linkedin:"LinkedIn——Benedict Patrick",
+    form_name_label:"您的姓名", form_name_ph:"张三", form_email_label:"邮箱", form_email_ph:"you@email.com",
+    form_need_label:"您需要什么服务?", opt_web:"网站开发", opt_beat:"曲目授权 / 定制曲目", opt_collab:"合作 / 联名", opt_other:"其他",
+    form_details_label:"详细信息", form_details_ph:"请告诉我您的项目、曲目需求或合作想法...", btn_send:"发送信息 →",
+    footer_copy:"© 2026 Northhh — 保留所有权利"
+  },
+  ru: {
+    menu_label:"МЕНЮ",
+    nav_contact:"Контакты",
+    hero_role_sticker:"FULL STACK РАЗРАБОТЧИК",
+    hero_headline:"Я создаю 🎯 продукты для маркетплейсов и творческих платформ 🎵.",
+    proj_current:"✦ СЕЙЧАС В РАЗРАБОТКЕ",
+    nav_home:"Главная", nav_about:"Обо мне", nav_work:"Работы", nav_beats:"Биты",
+    hero_label:"меня зовут Northhh", hero_tagline:"Сейчас разрабатываю KLAVE · Также беру фриланс-проекты по вебу и лицензированию битов",
+    badge_available:"ОТКРЫТ ДЛЯ РАБОТЫ", hero_loc:"ЗАПАДНАЯ АФРИКА", hero_role:"Full Stack разработчик / Битмейкер / Кибербезопасность",
+    hero_pitch:"Я создаю продукты для маркетплейсов и творческих платформ — а потом пишу для них саундтрек по вечерам.",
+    btn_contact:"Написать мне",
+    about_label:"обо мне!", about_title:"Немного о себе",
+    about_p1:"Я <strong>Northhh</strong> (Бенедикт Патрик) — full stack разработчик, битмейкер и специалист по кибербезопасности из Западной Африки.",
+    about_p2:"Сейчас я полностью погружён в <strong>KLAVE</strong> — маркетплейс битов на основе ИИ, который создаю в одиночку: продукт, фронтенд, бэкенд и инфраструктуру. Параллельно беру фриланс-проекты по вебу и делаю кинематографичные, мощные биты под именем <strong>Beats By Northhh</strong>.",
+    about_p3:"Подход один и тот же: разобрать что-то сложное на части и собрать заново так, чтобы оно просто работало.",
+    tag_fullstack:"Full Stack разработка", tag_cyber:"Кибербезопасность", tag_beat:"Создание битов", tag_brand:"Брендинг",
+    work_label:"мои работы!", work_title:"Избранные проекты", work_sub:"Маркетплейсы, приложения реального времени и брендинг — созданные от начала до конца.",
+    w1_tags:"ИИ-маркетплейс · Firebase", w1_desc:"Маркетплейс битов на основе ИИ, созданный на фоне растущего потока музыки, сгенерированной ИИ — сочетает маркетплейс продюсеров с NERO, встроенным ИИ-помощником на базе Claude, помогающим артистам находить и лицензировать нужный звук.",
+    w1_role:"<strong>Роль:</strong> соло-основатель и разработчик. <strong>Стек:</strong> Firebase Auth + Firestore, Cloudinary, Vercel, Claude API.",
+    link_view:"Смотреть проект ↗",
+    w2_tags:"Реальное время · Firebase", w2_desc:"Игра для пар в реальном времени с кодами комнат, разными режимами и мгновенным раскрытием ответов — на Firebase Realtime Database, развёрнута на Vercel.",
+    w3_tags:"Интерактив · Фронтенд", w3_desc:"Персонализированный интерактивный сайт с индивидуальными шкалами настроения, анимацией и тёплым кинематографичным дизайном — создан как душевный цифровой подарок.",
+    w4_tags:"Семантический HTML · Доступность", w4_desc:"Полноценная семантическая веб-страница по макету из Figma — структура, мультимедиа, таблицы, формы и доступность, выполнена в рамках курса по фронтенд-разработке.",
+    w5_tags:"Брендинг · Дизайн", w5_desc:"Рекламные материалы и визуальная айдентика для Heela's Catering Services, включая идеи флаеров на основе ИИ и общее направление.",
+    beats_label:"на досуге", beats_sub:"Кинематографичные, мощные биты. Слушайте на всех основных платформах или напишите мне для лицензирования трека.", btn_license:"Лицензировать бит",
+    contact_label:"на связи", contact_title:"Связаться со мной", contact_sub:"Открыт для новых проектов — веб-разработка, лицензирование битов и коллаборации. Email или WhatsApp — самый быстрый способ связаться.",
+    booking_status:"Сейчас принимаю заказы", contact_whatsapp:"WhatsApp — самый быстрый ответ", contact_linkedin:"LinkedIn — Benedict Patrick",
+    form_name_label:"Ваше имя", form_name_ph:"Иван Иванов", form_email_label:"Email", form_email_ph:"you@email.com",
+    form_need_label:"Что вам нужно?", opt_web:"Веб-разработка", opt_beat:"Лицензия на бит / Кастомный бит", opt_collab:"Коллаборация / Партнёрство", opt_other:"Другое",
+    form_details_label:"Подробности", form_details_ph:"Расскажите о вашем проекте, запросе на бит или идее коллаборации...", btn_send:"Отправить →",
+    footer_copy:"© 2026 Northhh — Все права защищены"
+  },
+  pt: {
+    menu_label:"MENU",
+    nav_contact:"Contato",
+    hero_role_sticker:"DESENVOLVEDOR FULL STACK",
+    hero_headline:"Eu construo 🎯 os produtos por trás de marketplaces e plataformas criativas 🎵.",
+    proj_current:"✦ EM DESENVOLVIMENTO",
+    nav_home:"Início", nav_about:"Sobre", nav_work:"Trabalhos", nav_beats:"Beats",
+    hero_label:"meu nome é Northhh", hero_tagline:"Atualmente construindo o KLAVE · Também faço sites freelance e licenciamento de beats",
+    badge_available:"DISPONÍVEL PARA NOVOS TRABALHOS", hero_loc:"ÁFRICA OCIDENTAL", hero_role:"Desenvolvedor Full Stack / Beatmaker / Cibersegurança",
+    hero_pitch:"Construo os produtos por trás de marketplaces e plataformas criativas — depois produzo a trilha sonora deles fora do expediente.",
+    btn_contact:"Fale Comigo",
+    about_label:"sobre mim!", about_title:"Novidades",
+    about_p1:"Sou o <strong>Northhh</strong> (Benedict Patrick) — desenvolvedor full stack, beatmaker e profissional de cibersegurança baseado na África Ocidental.",
+    about_p2:"No momento estou focado no <strong>KLAVE</strong>, um marketplace de beats com IA que estou construindo sozinho — produto, frontend, backend e infraestrutura. Além disso, faço sites freelance e produzo beats cinematográficos e marcantes sob o nome <strong>Beats By Northhh</strong>.",
+    about_p3:"A abordagem é sempre a mesma: pegar algo complicado, desmontar e remontar até funcionar de verdade.",
+    tag_fullstack:"Desenvolvimento Full Stack", tag_cyber:"Cibersegurança", tag_beat:"Produção de Beats", tag_brand:"Branding",
+    work_label:"conheça meu trabalho!", work_title:"Projetos em Destaque", work_sub:"Marketplaces, apps em tempo real e projetos de marca — construídos do início ao fim.",
+    w1_tags:"Marketplace com IA · Firebase", w1_desc:"Um marketplace de beats com IA criado para um mercado inundado por música gerada por IA — unindo um marketplace de produtores ao NERO, um assistente de IA integrado com tecnologia Claude, para ajudar artistas a encontrar e licenciar o som certo.",
+    w1_role:"<strong>Função:</strong> Fundador e desenvolvedor solo. <strong>Stack:</strong> Firebase Auth + Firestore, Cloudinary, Vercel, Claude API.",
+    link_view:"Ver Projeto ↗",
+    w2_tags:"Tempo Real · Firebase", w2_desc:"Um jogo remoto para casais em tempo real, com códigos de sala, vários modos de jogo e revelação de respostas ao vivo — construído no Firebase Realtime Database e hospedado na Vercel.",
+    w3_tags:"Interativo · Frontend", w3_desc:"Um site interativo e personalizado com medidores de clima próprios, elementos animados e um design cinematográfico e acolhedor — feito como um presente digital especial.",
+    w4_tags:"HTML Semântico · Acessibilidade", w4_desc:"Uma página web totalmente semântica construída a partir de um mockup no Figma — estrutura, multimídia, tabelas, formulários e acessibilidade, feita para um curso de desenvolvimento frontend.",
+    w5_tags:"Branding · Design", w5_desc:"Materiais promocionais e identidade visual para a Heela's Catering Services, incluindo propostas de flyers com IA e direção de marca.",
+    beats_label:"nas horas vagas", beats_sub:"Beats cinematográficos e marcantes. Ouça nas principais plataformas ou entre em contato para licenciar uma faixa.", btn_license:"Licenciar um Beat",
+    contact_label:"vamos conversar", contact_title:"Entre em Contato", contact_sub:"Aberto para novos trabalhos — sites, licenciamento de beats e parcerias. Email ou WhatsApp é a forma mais rápida de falar comigo.",
+    booking_status:"Aceitando novos projetos", contact_whatsapp:"WhatsApp — resposta mais rápida", contact_linkedin:"LinkedIn — Benedict Patrick",
+    form_name_label:"Seu Nome", form_name_ph:"João Silva", form_email_label:"Email", form_email_ph:"voce@email.com",
+    form_need_label:"O que você precisa?", opt_web:"Desenvolvimento Web", opt_beat:"Licença de Beat / Beat Personalizado", opt_collab:"Colaboração / Parceria", opt_other:"Outro",
+    form_details_label:"Detalhes", form_details_ph:"Conte-me sobre seu projeto, pedido de beat ou ideia de colaboração...", btn_send:"Enviar Mensagem →",
+    footer_copy:"© 2026 Northhh — Todos os direitos reservados"
+  },
+  es: {
+    menu_label:"MENÚ",
+    nav_contact:"Contacto",
+    hero_role_sticker:"DESARROLLADOR FULL STACK",
+    hero_headline:"Construyo 🎯 los productos detrás de marketplaces y plataformas creativas 🎵.",
+    proj_current:"✦ EN CONSTRUCCIÓN",
+    nav_home:"Inicio", nav_about:"Sobre mí", nav_work:"Trabajos", nav_beats:"Beats",
+    hero_label:"me llamo Northhh", hero_tagline:"Actualmente construyendo KLAVE · También hago sitios web freelance y licencio beats",
+    badge_available:"DISPONIBLE PARA NUEVOS PROYECTOS", hero_loc:"ÁFRICA OCCIDENTAL", hero_role:"Desarrollador Full Stack / Beatmaker / Ciberseguridad",
+    hero_pitch:"Construyo los productos detrás de marketplaces y plataformas creativas — y luego produzco la banda sonora fuera de horario.",
+    btn_contact:"Contáctame",
+    about_label:"¡sobre mí!", about_title:"Qué hay de nuevo",
+    about_p1:"Soy <strong>Northhh</strong> (Benedict Patrick) — desarrollador full stack, beatmaker y profesional de ciberseguridad radicado en África Occidental.",
+    about_p2:"Ahora mismo estoy enfocado en <strong>KLAVE</strong>, un marketplace de beats con IA que estoy construyendo en solitario — producto, frontend, backend e infraestructura. Además, hago sitios web freelance y produzco beats cinematográficos y contundentes bajo el nombre <strong>Beats By Northhh</strong>.",
+    about_p3:"El enfoque es siempre el mismo: tomar algo complicado, desarmarlo y reconstruirlo hasta que simplemente funcione.",
+    tag_fullstack:"Desarrollo Full Stack", tag_cyber:"Ciberseguridad", tag_beat:"Producción de Beats", tag_brand:"Branding",
+    work_label:"¡explora mi trabajo!", work_title:"Proyectos Destacados", work_sub:"Marketplaces, apps en tiempo real y proyectos de marca — construidos de principio a fin.",
+    w1_tags:"Marketplace con IA · Firebase", w1_desc:"Un marketplace de beats con IA creado para un mercado inundado de música generada por IA — combina un marketplace de productores con NERO, un asistente de IA integrado con tecnología Claude, para ayudar a los artistas a encontrar y licenciar el sonido adecuado.",
+    w1_role:"<strong>Rol:</strong> Fundador y desarrollador en solitario. <strong>Stack:</strong> Firebase Auth + Firestore, Cloudinary, Vercel, Claude API.",
+    link_view:"Ver Proyecto ↗",
+    w2_tags:"Tiempo Real · Firebase", w2_desc:"Un juego remoto para parejas en tiempo real, con códigos de sala, varios modos de juego y revelación de respuestas en vivo — construido con Firebase Realtime Database y desplegado en Vercel.",
+    w3_tags:"Interactivo · Frontend", w3_desc:"Un sitio interactivo y personalizado con medidores de ánimo propios, elementos animados y un diseño cinematográfico y cálido — creado como un regalo digital especial.",
+    w4_tags:"HTML Semántico · Accesibilidad", w4_desc:"Una página web totalmente semántica construida a partir de un mockup de Figma — estructura, multimedia, tablas, formularios y accesibilidad, realizada para un curso de desarrollo frontend.",
+    w5_tags:"Branding · Diseño", w5_desc:"Materiales promocionales e identidad visual de marca para Heela's Catering Services, incluyendo propuestas de folletos con IA y dirección de marca.",
+    beats_label:"en mis ratos libres", beats_sub:"Beats cinematográficos y contundentes. Escúchalos en las principales plataformas o contáctame para licenciar una pista.", btn_license:"Licenciar un Beat",
+    contact_label:"hablemos", contact_title:"Ponte en Contacto", contact_sub:"Abierto a nuevos proyectos — sitios web, licencias de beats y colaboraciones. Email o WhatsApp es la forma más rápida de contactarme.",
+    booking_status:"Aceptando proyectos actualmente", contact_whatsapp:"WhatsApp — respuesta más rápida", contact_linkedin:"LinkedIn — Benedict Patrick",
+    form_name_label:"Tu Nombre", form_name_ph:"Juan Pérez", form_email_label:"Email", form_email_ph:"tu@email.com",
+    form_need_label:"¿Qué necesitas?", opt_web:"Desarrollo Web", opt_beat:"Licencia de Beat / Beat Personalizado", opt_collab:"Colaboración / Sociedad", opt_other:"Otro",
+    form_details_label:"Detalles", form_details_ph:"Cuéntame sobre tu proyecto, solicitud de beat o idea de colaboración...", btn_send:"Enviar Mensaje →",
+    footer_copy:"© 2026 Northhh — Todos los derechos reservados"
+  },
+  fr: {
+    menu_label:"MENU",
+    nav_contact:"Contact",
+    hero_role_sticker:"DÉVELOPPEUR FULL STACK",
+    hero_headline:"Je construis 🎯 les produits derrière les marketplaces et plateformes créatives 🎵.",
+    proj_current:"✦ EN COURS DE CONSTRUCTION",
+    nav_home:"Accueil", nav_about:"À propos", nav_work:"Travaux", nav_beats:"Beats",
+    hero_label:"je m'appelle Northhh", hero_tagline:"En train de construire KLAVE · Je fais aussi des sites en freelance et des licences de beats",
+    badge_available:"DISPONIBLE POUR DE NOUVEAUX PROJETS", hero_loc:"AFRIQUE DE L'OUEST", hero_role:"Développeur Full Stack / Beatmaker / Cybersécurité",
+    hero_pitch:"Je construis les produits derrière les marketplaces et plateformes créatives — puis j'en compose la bande-son en dehors des heures de travail.",
+    btn_contact:"Me Contacter",
+    about_label:"à propos de moi !", about_title:"Quoi de neuf",
+    about_p1:"Je suis <strong>Northhh</strong> (Benedict Patrick) — développeur full stack, beatmaker et praticien en cybersécurité basé en Afrique de l'Ouest.",
+    about_p2:"En ce moment, je suis concentré sur <strong>KLAVE</strong>, une marketplace de beats propulsée par l'IA que je construis seul — produit, frontend, backend et infrastructure. À côté, je fais des sites en freelance et je produis des beats cinématographiques et percutants sous le nom <strong>Beats By Northhh</strong>.",
+    about_p3:"L'approche est toujours la même : prendre quelque chose de compliqué, le démonter, puis le remonter pour que ça fonctionne vraiment.",
+    tag_fullstack:"Développement Full Stack", tag_cyber:"Cybersécurité", tag_beat:"Production de Beats", tag_brand:"Branding",
+    work_label:"découvrez mon travail !", work_title:"Projets Phares", work_sub:"Marketplaces, applications en temps réel et projets de marque — construits de bout en bout.",
+    w1_tags:"Marketplace IA · Firebase", w1_desc:"Une marketplace de beats propulsée par l'IA, créée pour un marché saturé de musique générée par IA — combinant une marketplace de producteurs avec NERO, un assistant IA intégré propulsé par Claude, pour aider les artistes à trouver et licencier le bon son.",
+    w1_role:"<strong>Rôle :</strong> Fondateur et développeur solo. <strong>Stack :</strong> Firebase Auth + Firestore, Cloudinary, Vercel, Claude API.",
+    link_view:"Voir le Projet ↗",
+    w2_tags:"Temps Réel · Firebase", w2_desc:"Un jeu en temps réel pour couples à distance, avec codes de salle, plusieurs modes de jeu et révélation des réponses en direct — construit sur Firebase Realtime Database et déployé sur Vercel.",
+    w3_tags:"Interactif · Frontend", w3_desc:"Un site interactif personnalisé avec des indicateurs d'ambiance sur mesure, des éléments animés et un design cinématographique chaleureux — conçu comme un cadeau numérique sincère.",
+    w4_tags:"HTML Sémantique · Accessibilité", w4_desc:"Une page web entièrement sémantique construite à partir d'une maquette Figma — structure, multimédia, tableaux, formulaires et accessibilité, réalisée dans le cadre d'un cours de développement frontend.",
+    w5_tags:"Branding · Design", w5_desc:"Supports promotionnels et identité visuelle de marque pour Heela's Catering Services, y compris des propositions de flyers assistées par IA et une direction de marque.",
+    beats_label:"à côté", beats_sub:"Des beats cinématographiques et percutants. Écoutez sur toutes les grandes plateformes, ou contactez-moi pour licencier un titre.", btn_license:"Licencier un Beat",
+    contact_label:"discutons", contact_title:"Me Contacter", contact_sub:"Ouvert à de nouveaux projets — sites web, licences de beats et collaborations. Email ou WhatsApp est le moyen le plus rapide de me joindre.",
+    booking_status:"Actuellement disponible", contact_whatsapp:"WhatsApp — réponse la plus rapide", contact_linkedin:"LinkedIn — Benedict Patrick",
+    form_name_label:"Votre Nom", form_name_ph:"Jean Dupont", form_email_label:"Email", form_email_ph:"vous@email.com",
+    form_need_label:"De quoi avez-vous besoin ?", opt_web:"Développement Web", opt_beat:"Licence de Beat / Beat Personnalisé", opt_collab:"Collaboration / Partenariat", opt_other:"Autre",
+    form_details_label:"Détails", form_details_ph:"Parlez-moi de votre projet, de votre demande de beat ou de votre idée de collaboration...", btn_send:"Envoyer le Message →",
+    footer_copy:"© 2026 Northhh — Tous droits réservés"
+  },
+  de: {
+    menu_label:"MENÜ",
+    nav_contact:"Kontakt",
+    hero_role_sticker:"FULL-STACK-ENTWICKLER",
+    hero_headline:"Ich baue 🎯 die Produkte hinter Marktplätzen und kreativen Plattformen 🎵.",
+    proj_current:"✦ AKTUELL IM BAU",
+    nav_home:"Start", nav_about:"Über mich", nav_work:"Arbeiten", nav_beats:"Beats",
+    hero_label:"mein Name ist Northhh", hero_tagline:"Baue gerade KLAVE · Übernehme außerdem freiberufliche Webprojekte und Beat-Lizenzierung",
+    badge_available:"VERFÜGBAR FÜR NEUE PROJEKTE", hero_loc:"WESTAFRIKA", hero_role:"Full-Stack-Entwickler / Beatmaker / Cybersicherheit",
+    hero_pitch:"Ich baue die Produkte hinter Marktplätzen und kreativen Plattformen — und produziere danach abends den Soundtrack dazu.",
+    btn_contact:"Kontaktiere Mich",
+    about_label:"über mich!", about_title:"Was geht ab",
+    about_p1:"Ich bin <strong>Northhh</strong> (Benedict Patrick) — Full-Stack-Entwickler, Beatmaker und Cybersicherheitsexperte mit Sitz in Westafrika.",
+    about_p2:"Gerade konzentriere ich mich auf <strong>KLAVE</strong>, einen KI-gestützten Beat-Marktplatz, den ich allein aufbaue — Produkt, Frontend, Backend und Infrastruktur. Nebenbei übernehme ich freiberufliche Webprojekte und produziere kinoreife, kraftvolle Beats unter dem Namen <strong>Beats By Northhh</strong>.",
+    about_p3:"Der Ansatz bleibt derselbe: etwas Kompliziertes auseinandernehmen und neu zusammensetzen, bis es wirklich funktioniert.",
+    tag_fullstack:"Full-Stack-Entwicklung", tag_cyber:"Cybersicherheit", tag_beat:"Beat-Produktion", tag_brand:"Branding",
+    work_label:"meine Arbeiten!", work_title:"Ausgewählte Projekte", work_sub:"Marktplätze, Echtzeit-Apps und Markenprojekte — von Anfang bis Ende selbst gebaut.",
+    w1_tags:"KI-Marktplatz · Firebase", w1_desc:"Ein KI-gestützter Beat-Marktplatz, entwickelt für einen Markt voller KI-generierter Musik — kombiniert einen Producer-Marktplatz mit NERO, einem integrierten KI-Assistenten auf Claude-Basis, der Künstlern hilft, den richtigen Sound zu finden und zu lizenzieren.",
+    w1_role:"<strong>Rolle:</strong> Alleiniger Gründer & Entwickler. <strong>Stack:</strong> Firebase Auth + Firestore, Cloudinary, Vercel, Claude API.",
+    link_view:"Projekt Ansehen ↗",
+    w2_tags:"Echtzeit · Firebase", w2_desc:"Ein Echtzeit-Spiel für Paare mit Raumcodes, mehreren Spielmodi und Live-Antwortauflösung — gebaut mit Firebase Realtime Database und auf Vercel bereitgestellt.",
+    w3_tags:"Interaktiv · Frontend", w3_desc:"Eine personalisierte interaktive Website mit eigenen Stimmungsanzeigen, animierten Elementen und warmem, kinoreifem Design — als herzliches digitales Geschenk gestaltet.",
+    w4_tags:"Semantisches HTML · Barrierefreiheit", w4_desc:"Eine vollständig semantische Webseite nach einem Figma-Mockup — Struktur, Multimedia, Tabellen, Formulare und Barrierefreiheit, erstellt im Rahmen eines Frontend-Entwicklungskurses.",
+    w5_tags:"Branding · Design", w5_desc:"Werbematerialien und visuelle Markenidentität für Heela's Catering Services, einschließlich KI-gestützter Flyer-Vorschläge und Markenausrichtung.",
+    beats_label:"nebenbei", beats_sub:"Kinoreife, kraftvolle Beats. Auf allen großen Plattformen streamen oder mich für eine Track-Lizenz kontaktieren.", btn_license:"Beat Lizenzieren",
+    contact_label:"lass uns reden", contact_title:"Kontakt Aufnehmen", contact_sub:"Offen für neue Projekte — Webentwicklung, Beat-Lizenzierung und Kooperationen. Email oder WhatsApp ist der schnellste Weg, mich zu erreichen.",
+    booking_status:"Aktuell buchbar", contact_whatsapp:"WhatsApp — schnellste Antwort", contact_linkedin:"LinkedIn — Benedict Patrick",
+    form_name_label:"Dein Name", form_name_ph:"Max Mustermann", form_email_label:"Email", form_email_ph:"du@email.com",
+    form_need_label:"Was brauchst du?", opt_web:"Webentwicklung", opt_beat:"Beat-Lizenz / Individueller Beat", opt_collab:"Kooperation / Partnerschaft", opt_other:"Etwas Anderes",
+    form_details_label:"Details", form_details_ph:"Erzähl mir von deinem Projekt, deiner Beat-Anfrage oder Kooperationsidee...", btn_send:"Nachricht Senden →",
+    footer_copy:"© 2026 Northhh — Alle Rechte vorbehalten"
+  },
+  ar: {
+    menu_label:"القائمة",
+    nav_contact:"تواصل",
+    hero_role_sticker:"مطوّر FULL STACK",
+    hero_headline:"أبني 🎯 المنتجات التي تقف خلف الأسواق الرقمية والمنصات الإبداعية 🎵.",
+    proj_current:"✦ قيد الإنشاء حاليًا",
+    nav_home:"الرئيسية", nav_about:"نبذة عني", nav_work:"أعمالي", nav_beats:"الموسيقى",
+    hero_label:"اسمي Northhh", hero_tagline:"أعمل حاليًا على KLAVE · وأقدّم أيضًا خدمات بناء مواقع مستقلة وترخيص المقطوعات الموسيقية",
+    badge_available:"متاح لأعمال جديدة", hero_loc:"غرب أفريقيا", hero_role:"مطوّر Full Stack / منتج موسيقي / أمن سيبراني",
+    hero_pitch:"أبني المنتجات التي تقف خلف الأسواق الرقمية والمنصات الإبداعية — ثم أنتج الموسيقى التصويرية لها بعد ساعات العمل.",
+    btn_contact:"تواصل معي",
+    about_label:"نبذة عني!", about_title:"آخر الأخبار",
+    about_p1:"أنا <strong>Northhh</strong> (بنديكت باتريك) — مطوّر Full Stack ومنتج موسيقي ومختص في الأمن السيبراني، أقيم في غرب أفريقيا.",
+    about_p2:"أركّز حاليًا على <strong>KLAVE</strong>، وهو سوق رقمي للمقطوعات الموسيقية مدعوم بالذكاء الاصطناعي أقوم ببنائه بمفردي — المنتج والواجهة الأمامية والخلفية والبنية التحتية. إلى جانب ذلك، أعمل على مشاريع مواقع مستقلة وأنتج مقطوعات موسيقية سينمائية وقوية تحت اسم <strong>Beats By Northhh</strong>.",
+    about_p3:"النهج نفسه دائمًا: أخذ شيء معقّد، وتفكيكه، وإعادة بنائه ليعمل بشكل صحيح فعليًا.",
+    tag_fullstack:"تطوير Full Stack", tag_cyber:"الأمن السيبراني", tag_beat:"إنتاج الموسيقى", tag_brand:"الهوية البصرية",
+    work_label:"استكشف أعمالي!", work_title:"أعمال مختارة", work_sub:"أسواق رقمية وتطبيقات لحظية ومشاريع هوية بصرية — مبنية من الألف إلى الياء.",
+    w1_tags:"سوق بالذكاء الاصطناعي · Firebase", w1_desc:"سوق رقمي للمقطوعات الموسيقية مدعوم بالذكاء الاصطناعي، صُمم في ظل انتشار الموسيقى المولّدة بالذكاء الاصطناعي — يجمع بين سوق للمنتجين ومساعد ذكاء اصطناعي مدمج يُدعى NERO مدعوم بتقنية Claude، لمساعدة الفنانين على إيجاد وترخيص الصوت المناسب.",
+    w1_role:"<strong>الدور:</strong> مؤسس ومطوّر منفرد. <strong>التقنيات:</strong> Firebase Auth + Firestore، Cloudinary، Vercel، Claude API.",
+    link_view:"عرض المشروع ↗",
+    w2_tags:"لحظي · Firebase", w2_desc:"لعبة تفاعلية عن بُعد للأزواج بنظام لحظي، مع رموز غرف وأنماط لعب متعددة وكشف فوري للإجابات — مبنية على Firebase Realtime Database ومنشورة على Vercel.",
+    w3_tags:"تفاعلي · واجهة أمامية", w3_desc:"موقع تفاعلي مخصص مزوّد بمقاييس مزاج مخصصة وعناصر متحركة وتصميم سينمائي دافئ — صُمم كهدية رقمية صادقة.",
+    w4_tags:"HTML دلالي · إمكانية الوصول", w4_desc:"صفحة ويب دلالية كاملة مبنية من تصميم Figma — تشمل الهيكل والوسائط المتعددة والجداول والنماذج وإمكانية الوصول، أُنجزت ضمن دورة تطوير واجهات أمامية.",
+    w5_tags:"هوية بصرية · تصميم", w5_desc:"مواد ترويجية وهوية بصرية لشركة Heela's Catering Services، تشمل اقتراحات منشورات مدعومة بالذكاء الاصطناعي وتوجيه الهوية.",
+    beats_label:"في وقت الفراغ", beats_sub:"مقطوعات موسيقية سينمائية وقوية. استمع عبر جميع المنصات الرئيسية، أو تواصل معي لترخيص مقطوعة.", btn_license:"ترخيص مقطوعة",
+    contact_label:"لنتحدث", contact_title:"تواصل معي", contact_sub:"متاح لأعمال جديدة — بناء مواقع وترخيص مقطوعات وتعاونات. البريد الإلكتروني أو واتساب هما أسرع طريقة للتواصل معي.",
+    booking_status:"أستقبل الحجوزات حاليًا", contact_whatsapp:"واتساب — أسرع استجابة", contact_linkedin:"LinkedIn — Benedict Patrick",
+    form_name_label:"اسمك", form_name_ph:"أحمد محمد", form_email_label:"البريد الإلكتروني", form_email_ph:"you@email.com",
+    form_need_label:"ما الذي تحتاجه؟", opt_web:"تطوير مواقع", opt_beat:"ترخيص مقطوعة / مقطوعة مخصصة", opt_collab:"تعاون / شراكة", opt_other:"شيء آخر",
+    form_details_label:"التفاصيل", form_details_ph:"أخبرني عن مشروعك أو طلب المقطوعة أو فكرة التعاون...", btn_send:"إرسال الرسالة ←",
+    footer_copy:"© 2026 Northhh — جميع الحقوق محفوظة"
+  },
+  ja: {
+    menu_label:"メニュー",
+    nav_contact:"お問い合わせ",
+    hero_role_sticker:"フルスタック開発者",
+    hero_headline:"マーケットプレイスとクリエイティブなプラットフォームを支えるプロダクトを 🎯 構築しています 🎵。",
+    proj_current:"✦ 現在開発中",
+    nav_home:"ホーム", nav_about:"プロフィール", nav_work:"実績", nav_beats:"ビート",
+    hero_label:"私の名前は Northhh です", hero_tagline:"現在 KLAVE を開発中 · フリーランスのWeb制作やビートのライセンス提供も行っています",
+    badge_available:"新規案件募集中", hero_loc:"西アフリカ", hero_role:"フルスタック開発者 / ビートメーカー / サイバーセキュリティ",
+    hero_pitch:"マーケットプレイスやクリエイティブなプラットフォームを支えるプロダクトを開発し、その後仕事終わりにサウンドトラックを制作しています。",
+    btn_contact:"お問い合わせ",
+    about_label:"プロフィール", about_title:"近況",
+    about_p1:"<strong>Northhh</strong>(ベネディクト・パトリック)と申します。西アフリカを拠点に活動するフルスタック開発者、ビートメーカー、サイバーセキュリティ実務者です。",
+    about_p2:"現在は <strong>KLAVE</strong> の開発に専念しています。これはAI搭載のビートマーケットプレイスで、プロダクト・フロントエンド・バックエンド・インフラすべてを一人で構築しています。並行してフリーランスのWeb制作も行い、<strong>Beats By Northhh</strong> の名義で映画的で力強いビートを制作しています。",
+    about_p3:"アプローチはいつも同じです。複雑なものを分解し、きちんと機能するように組み立て直す。",
+    tag_fullstack:"フルスタック開発", tag_cyber:"サイバーセキュリティ", tag_beat:"ビート制作", tag_brand:"ブランディング",
+    work_label:"実績を見る", work_title:"注目のプロジェクト", work_sub:"マーケットプレイス、リアルタイムアプリ、ブランド構築——すべて一貫して手がけています。",
+    w1_tags:"AIマーケットプレイス · Firebase", w1_desc:"AI生成音楽が氾濫する市場のために作られた、AI搭載のビートマーケットプレイス。プロデューサー向けマーケットプレイスと、Claudeを搭載したAIアシスタント「NERO」を組み合わせ、アーティストが適切なサウンドを見つけてライセンス取得できるよう支援します。",
+    w1_role:"<strong>役割:</strong> 単独創業者兼開発者。<strong>技術スタック:</strong> Firebase Auth + Firestore、Cloudinary、Vercel、Claude API。",
+    link_view:"プロジェクトを見る ↗",
+    w2_tags:"リアルタイム · Firebase", w2_desc:"ルームコード、複数のゲームモード、リアルタイムの回答表示機能を備えた、カップル向けリアルタイム対戦ゲーム。Firebase Realtime Databaseで構築し、Vercelにデプロイ。",
+    w3_tags:"インタラクティブ · フロントエンド", w3_desc:"独自のムードメーター、アニメーション要素、温かみのある映画的デザインを備えたパーソナライズされたインタラクティブサイト。心のこもったデジタルギフトとして制作。",
+    w4_tags:"セマンティックHTML · アクセシビリティ", w4_desc:"Figmaのモックアップから構築した完全にセマンティックなWebページ。構造、マルチメディア、テーブル、フォーム、アクセシビリティを網羅し、フロントエンド開発コースの課題として制作。",
+    w5_tags:"ブランディング · デザイン", w5_desc:"Heela's Catering Servicesのための販促物とビジュアルブランドアイデンティティ。AI生成のフライヤー案とブランドディレクションを含む。",
+    beats_label:"サイドプロジェクト", beats_sub:"映画的で力強いビート。主要な各プラットフォームで配信中。楽曲のライセンスについてはお気軽にご連絡ください。", btn_license:"ビートをライセンスする",
+    contact_label:"お話ししましょう", contact_title:"お問い合わせ", contact_sub:"Web制作、ビートのライセンス、コラボレーションなど新規案件を募集中です。メールまたはWhatsAppが最も早く連絡が取れる方法です。",
+    booking_status:"現在受付中", contact_whatsapp:"WhatsApp — 最速で返信", contact_linkedin:"LinkedIn — Benedict Patrick",
+    form_name_label:"お名前", form_name_ph:"山田 太郎", form_email_label:"メールアドレス", form_email_ph:"you@email.com",
+    form_need_label:"ご希望の内容", opt_web:"Web開発", opt_beat:"ビートのライセンス / カスタムビート", opt_collab:"コラボレーション / パートナーシップ", opt_other:"その他",
+    form_details_label:"詳細", form_details_ph:"プロジェクトの内容、ビートのご要望、コラボのアイデアなどをお聞かせください...", btn_send:"メッセージを送信 →",
+    footer_copy:"© 2026 Northhh — All rights reserved"
+  }
+};
+
+const rtlLangs = new Set(['ar']);
+
+function applyLanguage(lang) {
+  const dict = translations[lang] || translations.en;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (dict[key] !== undefined) el.innerHTML = dict[key];
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+    const key = el.getAttribute('data-i18n-ph');
+    if (dict[key] !== undefined) el.setAttribute('placeholder', dict[key]);
+  });
+  document.documentElement.setAttribute('lang', lang);
+  document.documentElement.setAttribute('dir', rtlLangs.has(lang) ? 'rtl' : 'ltr');
+  try { localStorage.setItem('site_lang', lang); } catch (e) {}
+}
+
+(function() {
+  const select = document.getElementById('langSwitch');
+  let saved = 'en';
+  try { saved = localStorage.getItem('site_lang') || 'en'; } catch (e) {}
+  select.value = saved;
+  applyLanguage(saved);
+  select.addEventListener('change', () => applyLanguage(select.value));
+})();
+
+(function() {
+  const ring = document.getElementById('cursorRing');
+  const dot = document.getElementById('cursorDot');
+  if (!ring || !dot) return;
+  window.addEventListener('mousemove', (e) => {
+    ring.style.left = e.clientX + 'px';
+    ring.style.top = e.clientY + 'px';
+    dot.style.left = e.clientX + 'px';
+    dot.style.top = e.clientY + 'px';
+  });
+  const hoverables = 'a, button, select, input, textarea, .menu-btn, .btn-contact, .tag-block, .sticker';
+  document.addEventListener('mouseover', (e) => {
+    if (e.target.closest(hoverables)) ring.classList.add('hovering');
+  });
+  document.addEventListener('mouseout', (e) => {
+    if (e.target.closest(hoverables)) ring.classList.remove('hovering');
+  });
+})();
+</script>
+
+</body>
+</html>
